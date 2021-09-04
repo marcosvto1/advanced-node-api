@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "incremental": true,
+    "noImplicitOverride": true,
     "outDir": "dist",
     "rootDir": "src",
     "target": "es2021",

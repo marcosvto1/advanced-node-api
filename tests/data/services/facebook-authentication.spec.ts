@@ -1,5 +1,5 @@
 import { LoadFacebookUserApi } from '@/data/contracts/apis/facebook'
-import { LoadUserAccountRepository } from '@/data/contracts/repo'
+import { CreateFacebookAccountRepository, LoadUserAccountRepository } from '@/data/contracts/repo'
 import { FacebookAuthenticationService } from '@/data/services'
 import { AuthenticationError } from '@/domain/errors'
 import { mock, MockProxy } from 'jest-mock-extended'
@@ -7,18 +7,20 @@ import { mock, MockProxy } from 'jest-mock-extended'
 describe('FacebookAuthenticationService', () => {
   let loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
   let loadUserAccountRepo: MockProxy<LoadUserAccountRepository>
+  let createUserAccountRepo: MockProxy<CreateFacebookAccountRepository>
   let sut: FacebookAuthenticationService
   const token = 'any_token'
 
   beforeEach(() => {
     loadFacebookUserApi = mock()
     loadUserAccountRepo = mock()
+    createUserAccountRepo = mock()
     loadFacebookUserApi.loadUser.mockResolvedValue({
       name: 'any_fb_name',
       email: 'any@mail.com',
       facebookId: 'any_fb_id'
     })
-    sut = new FacebookAuthenticationService(loadFacebookUserApi, loadUserAccountRepo)
+    sut = new FacebookAuthenticationService(loadFacebookUserApi, loadUserAccountRepo, createUserAccountRepo)
   })
 
   it('should call LoadFacebookUser with correct params', async () => {
@@ -41,5 +43,18 @@ describe('FacebookAuthenticationService', () => {
 
     expect(loadUserAccountRepo.load).toHaveBeenCalledWith({ email: 'any@mail.com' })
     expect(loadUserAccountRepo.load).toHaveBeenCalledTimes(1)
+  })
+
+  it('should call CreateUserAccoutRepo when LoadUserAccountRepo returns undefined', async () => {
+    loadUserAccountRepo.load.mockResolvedValueOnce(undefined)
+
+    await sut.perform({ token })
+
+    expect(createUserAccountRepo.createFromFacebook).toHaveBeenCalledWith({
+      name: 'any_fb_name',
+      email: 'any@mail.com',
+      facebookId: 'any_fb_id'
+    })
+    expect(createUserAccountRepo.createFromFacebook).toHaveBeenCalledTimes(1)
   })
 })

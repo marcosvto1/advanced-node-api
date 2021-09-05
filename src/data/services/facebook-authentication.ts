@@ -6,14 +6,14 @@ import { FacebookAccount } from '@/domain/models/facebook-account'
 import { TokenGenerator } from '@/data/contracts/crypto'
 import { AccessToken } from '@/domain/models'
 
-export class FacebookAuthenticationService {
+export class FacebookAuthenticationService implements FacebookAuthentication {
   constructor (
     private readonly facebookApi: LoadFacebookUserApi,
     private readonly userAccountRepo: UserAccountRepository,
     private readonly crypto: TokenGenerator
   ) { }
 
-  async perform (params: FacebookAuthentication.Params): Promise<AuthenticationError> {
+  async perform (params: FacebookAuthentication.Params): Promise<FacebookAuthentication.Result> {
     const fbData = await this.facebookApi.loadUser({ token: params.token })
     if (fbData !== undefined) {
       const accountFounded = await this.userAccountRepo.load({
@@ -21,7 +21,8 @@ export class FacebookAuthenticationService {
       })
       const facebookAccount = new FacebookAccount(fbData, accountFounded)
       const { id } = await this.userAccountRepo.saveWithFacebook(facebookAccount)
-      await this.crypto.generateToken({ key: id, expirationInMs: AccessToken.expirationInMs })
+      const token = await this.crypto.generateToken({ key: id, expirationInMs: AccessToken.expirationInMs })
+      return new AccessToken(token)
     }
     return new AuthenticationError()
   }

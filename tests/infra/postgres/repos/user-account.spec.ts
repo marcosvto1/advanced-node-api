@@ -59,6 +59,25 @@ describe('PgUserAccountRepository', () => {
           id: '1'
         })
       )
+
+      await connection.close()
+    })
+
+    it('should return undefinied if email not exists', async () => {
+      const db = newDb()
+
+      const connection = await db.adapters.createTypeormConnection({
+        type: 'postgres',
+        entities: [
+          PgUser
+        ]
+      })
+      await connection.synchronize()
+      const sut = new PgUserAccountRepository()
+
+      const account = await sut.load({ email: 'new_email' })
+
+      expect(account).toBe(undefined)
     })
   })
 })

@@ -1,57 +1,28 @@
-import { LoadUserAccountRepository } from '@/data/contracts/repo'
-import { connect } from 'http2'
+import { PgUser } from '@/infra/postgres/entities'
+import { PgUserAccountRepository } from '@/infra/postgres/repos'
+import { IBackup, IMemoryDb, newDb } from 'pg-mem'
+import { getConnection, getRepository, Repository } from 'typeorm'
 
-import { IBackup, newDb } from 'pg-mem'
-import { Entity, PrimaryGeneratedColumn, Column, getRepository, Repository } from 'typeorm'
+const makeFakeDb = async (entities?: any[]): Promise<IMemoryDb & any> => {
+  const db = newDb()
+  const connection = await db.adapters.createTypeormConnection({
+    type: 'postgres',
+    entities: entities ?? ['src/infra/postgres/entities/index.ts']
+  })
 
-class PgUserAccountRepository implements LoadUserAccountRepository {
-  async load (params: LoadUserAccountRepository.Params): Promise<LoadUserAccountRepository.Result> {
-    const pgUserRepo = getRepository(PgUser)
-    const pgUser = await pgUserRepo.findOne({
-      email: params.email
-    })
+  await connection.synchronize()
 
-    if (pgUser !== undefined) {
-      return {
-        id: pgUser?.id?.toString(),
-        name: pgUser?.name ?? undefined
-      }
-    }
-  }
-}
-
-@Entity({ name: 'usuarios' })
-class PgUser {
-  @PrimaryGeneratedColumn()
-  id!: number
-
-  @Column({ name: 'nome', nullable: true })
-  name?: string
-
-  @Column()
-  email!: string
-
-  @Column({ name: 'id_facebook', nullable: true })
-  facebookId?: string
+  return db
 }
 
 describe('PgUserAccountRepository', () => {
   describe('load', () => {
     let sut: PgUserAccountRepository
     let pgUserRepo: Repository<PgUser>
-    const db = newDb()
     let backup: IBackup
-    let connection: any
 
     beforeAll(async () => {
-      connection = await db.adapters.createTypeormConnection({
-        type: 'postgres',
-        entities: [
-          PgUser
-        ]
-      })
-      await connection.synchronize()
-
+      const db = await makeFakeDb()
       pgUserRepo = getRepository(PgUser)
       backup = db.backup()
 
@@ -66,7 +37,7 @@ describe('PgUserAccountRepository', () => {
     })
 
     afterAll(async () => {
-      await connection.close()
+      await getConnection().close()
     })
 
     it('should return an account if email exists', async () => {
@@ -83,7 +54,7 @@ describe('PgUserAccountRepository', () => {
     it('should return undefinied if email not exists', async () => {
       const account = await sut.load({ email: 'any_email' })
 
-      expect(account).toBe(undefined)
+      expect(account).toBeUndefined()
     })
   })
 })

@@ -3,7 +3,7 @@
     "incremental": true,
     "noImplicitOverride": true,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDirs": ["src", "tests"],
     "target": "es2021",
     "sourceMap": true,
     "module": "commonjs",

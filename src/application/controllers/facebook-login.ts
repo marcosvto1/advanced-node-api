@@ -7,12 +7,12 @@ export class FacebookLoginController {
     private readonly facebookAuthenticationService: FacebookAuthenticationService
   ) { }
 
-  async handle (httpRequest: any): Promise<Http.Response> {
+  async handle (request: Http.Request): Promise<Http.Response> {
     try {
-      if (httpRequest.token === '' || httpRequest.token === null || httpRequest.token === undefined) {
+      if (request.token === '' || request.token === null || request.token === undefined) {
         return HttpStatus.badRequest(new HttpError.RequiredField('token'))
       }
-      const { token } = httpRequest
+      const { token } = request
       const accessToken = await this.facebookAuthenticationService.perform({ token })
       if (accessToken instanceof AccessToken) {
         return HttpStatus.ok({ accessToken: accessToken.value })
@@ -21,16 +21,9 @@ export class FacebookLoginController {
       }
     } catch (error) {
       if (error instanceof Error) {
-        return {
-          statusCode: 500,
-          data: new HttpError.Server(error)
-        }
+        return HttpStatus.serverError()
       }
-
-      return {
-        statusCode: 500,
-        data: new HttpError.Server()
-      }
+      return HttpStatus.serverError()
     }
   }
 }

@@ -1,7 +1,7 @@
 
 export namespace Http {
   export type Request = any
-  export type Response = { statusCode: number, data: any }
+  export type Response<T = any> = { statusCode: number, data: T }
   export enum Status {
     OK=200,
     BAD_REQUEST=400,
@@ -36,22 +36,22 @@ export namespace HttpError {
 }
 
 export namespace HttpStatus {
-  export const badRequest = (error: Error): Http.Response => ({
+  export const badRequest = (error: Error): Http.Response<Error> => ({
     statusCode: Http.Status.BAD_REQUEST,
     data: error
   })
 
-  export const ok = (data: any): Http.Response => ({
+  export const ok = <T = any>(data: T): Http.Response<T> => ({
     statusCode: Http.Status.OK,
     data
   })
 
-  export const unauthorized = (): Http.Response => ({
+  export const unauthorized = (): Http.Response<Error> => ({
     statusCode: Http.Status.UNAUTHORIZED,
     data: new HttpError.Unauthorized()
   })
 
-  export const serverError = (): Http.Response => ({
+  export const serverError = (): Http.Response<Error> => ({
     statusCode: Http.Status.SERVER_ERROR,
     data: new HttpError.Server()
   })

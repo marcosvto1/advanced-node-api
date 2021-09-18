@@ -2,12 +2,15 @@ import { Http, HttpStatus, HttpError } from '@/application/helpers'
 import { FacebookAuthenticationService } from '@/data/services'
 import { AccessToken } from '@/domain/models'
 
+export type Model = Error | {
+  accessToken: string
+}
 export class FacebookLoginController {
   constructor (
     private readonly facebookAuthenticationService: FacebookAuthenticationService
   ) { }
 
-  async handle (request: Http.Request): Promise<Http.Response> {
+  async handle (request: Http.Request): Promise<Http.Response<Model>> {
     try {
       if (request.token === '' || request.token === null || request.token === undefined) {
         return HttpStatus.badRequest(new HttpError.RequiredField('token'))

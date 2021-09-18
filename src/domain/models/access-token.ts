@@ -6,7 +6,7 @@ enum Time {
 }
 
 export class AccessToken {
-  constructor (private readonly value: string) {}
+  constructor (public readonly value: string) {}
 
   static get expirationInMs (): number {
     return Time.MIN * Time.SECOND * Time.MILLI

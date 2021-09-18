@@ -1,5 +1,5 @@
 import { FacebookLoginController } from '@/application/controllers'
-import { HttpError } from '@/application/helpers'
+import { Http, HttpError } from '@/application/helpers'
 import { FacebookAuthenticationService } from '@/data/services'
 import { AuthenticationError } from '@/domain/errors'
 import { AccessToken } from '@/domain/models'
@@ -20,8 +20,8 @@ describe('FacebookLoginController', () => {
     const httpResponse = await sut.handle({ token: '' })
 
     expect(httpResponse).toEqual({
-      statusCode: 400,
-      data: new HttpError.RequiredFieldError('token')
+      statusCode: Http.Status.BAD_REQUEST,
+      data: new HttpError.RequiredField('token')
     })
   })
 
@@ -30,7 +30,7 @@ describe('FacebookLoginController', () => {
 
     expect(httpResponse).toEqual({
       statusCode: 400,
-      data: new HttpError.RequiredFieldError('token')
+      data: new HttpError.RequiredField('token')
     })
   })
 
@@ -38,8 +38,8 @@ describe('FacebookLoginController', () => {
     const httpResponse = await sut.handle({ token: '' })
 
     expect(httpResponse).toEqual({
-      statusCode: 400,
-      data: new HttpError.RequiredFieldError('token')
+      statusCode: Http.Status.BAD_REQUEST,
+      data: new HttpError.RequiredField('token')
     })
   })
 
@@ -49,8 +49,8 @@ describe('FacebookLoginController', () => {
     const httpResponse = await sut.handle({ token: 'any_token' })
 
     expect(httpResponse).toEqual({
-      statusCode: 401,
-      data: new AuthenticationError()
+      statusCode: Http.Status.UNAUTHORIZED,
+      data: new HttpError.Unauthorized()
     })
   })
 
@@ -58,7 +58,7 @@ describe('FacebookLoginController', () => {
     const httpResponse = await sut.handle({ token: 'any_token' })
 
     expect(httpResponse).toEqual({
-      statusCode: 200,
+      statusCode: Http.Status.OK,
       data: {
         accessToken: 'any_value'
       }
@@ -71,8 +71,8 @@ describe('FacebookLoginController', () => {
     const httpResponse = await sut.handle({ token: 'any_token' })
 
     expect(httpResponse).toEqual({
-      statusCode: 500,
-      data: new HttpError.ServerError(error)
+      statusCode: Http.Status.SERVER_ERROR,
+      data: new HttpError.Server(error)
     })
   })
 

@@ -1,4 +1,4 @@
-import { Http, HttpError } from '@/application/helpers'
+import { Http, HttpStatus, HttpError } from '@/application/helpers'
 import { FacebookAuthenticationService } from '@/data/services'
 import { AccessToken } from '@/domain/models'
 
@@ -10,29 +10,26 @@ export class FacebookLoginController {
   async handle (httpRequest: any): Promise<Http.Response> {
     try {
       if (httpRequest.token === '' || httpRequest.token === null || httpRequest.token === undefined) {
-        return Http.badRequest(new HttpError.RequiredFieldError('token'))
+        return HttpStatus.badRequest(new HttpError.RequiredField('token'))
       }
       const { token } = httpRequest
-      const result = await this.facebookAuthenticationService.perform({ token })
-      if (result instanceof AccessToken) {
-        return Http.ok({ accessToken: result.value })
+      const accessToken = await this.facebookAuthenticationService.perform({ token })
+      if (accessToken instanceof AccessToken) {
+        return HttpStatus.ok({ accessToken: accessToken.value })
       } else {
-        return {
-          statusCode: 401,
-          data: result
-        }
+        return HttpStatus.unauthorized()
       }
     } catch (error) {
       if (error instanceof Error) {
         return {
           statusCode: 500,
-          data: new HttpError.ServerError(error)
+          data: new HttpError.Server(error)
         }
       }
 
       return {
         statusCode: 500,
-        data: new HttpError.ServerError()
+        data: new HttpError.Server()
       }
     }
   }

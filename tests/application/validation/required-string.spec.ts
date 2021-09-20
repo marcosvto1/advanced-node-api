@@ -31,6 +31,6 @@ describe('RequiredStringValidator', () => {
 
     const validate = sut.validate()
 
-    expect(validate).toBe(true)
+    expect(validate).toBe(undefined)
   })
 })

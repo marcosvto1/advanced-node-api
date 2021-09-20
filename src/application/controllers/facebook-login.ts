@@ -1,4 +1,4 @@
-import { Http, HttpStatus, HttpError } from '@/application/helpers'
+import { Http, HttpStatus } from '@/application/helpers'
 import { RequiredStringValidator } from '@/application/validation'
 import { FacebookAuthenticationService } from '@/data/services'
 import { AccessToken } from '@/domain/models'
@@ -14,7 +14,7 @@ export class FacebookLoginController {
   async handle (request: Http.Request): Promise<Http.Response<Model>> {
     try {
       const error = this.validate(request)
-      if (error !== true) {
+      if (error !== undefined) {
         return HttpStatus.badRequest(error)
       }
       const { token } = request
@@ -32,7 +32,7 @@ export class FacebookLoginController {
     }
   }
 
-  private validate (request: Http.Request): Error | true {
+  private validate (request: Http.Request): Error | undefined {
     const validator = new RequiredStringValidator(request.token, 'token')
     return validator.validate()
   }

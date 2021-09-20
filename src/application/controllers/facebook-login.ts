@@ -12,8 +12,9 @@ export class FacebookLoginController {
 
   async handle (request: Http.Request): Promise<Http.Response<Model>> {
     try {
-      if (request.token === '' || request.token === null || request.token === undefined) {
-        return HttpStatus.badRequest(new HttpError.RequiredField('token'))
+      const error = this.validate(request)
+      if (error !== undefined) {
+        return HttpStatus.badRequest(error)
       }
       const { token } = request
       const accessToken = await this.facebookAuthenticationService.perform({ token })
@@ -27,6 +28,12 @@ export class FacebookLoginController {
         return HttpStatus.serverError()
       }
       return HttpStatus.serverError()
+    }
+  }
+
+  private validate (request: Http.Request): Error | undefined {
+    if (request.token === '' || request.token === null || request.token === undefined) {
+      return new HttpError.RequiredField('token')
     }
   }
 }

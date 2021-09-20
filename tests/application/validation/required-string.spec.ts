@@ -5,7 +5,7 @@ class RequiredStringValidator {
 
   validate (): Error | true {
     if (this.value === '' || this.value === null || this.value === undefined) {
-      return new HttpError.RequiredField('any_field')
+      return new HttpError.RequiredField(this.field)
     }
 
     return true

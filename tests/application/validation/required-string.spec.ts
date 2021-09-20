@@ -1,16 +1,5 @@
 import { HttpError } from '@/application/helpers'
-
-class RequiredStringValidator {
-  constructor (private readonly value: any, private readonly field: string) {}
-
-  validate (): Error | true {
-    if (this.value === '' || this.value === null || this.value === undefined) {
-      return new HttpError.RequiredField(this.field)
-    }
-
-    return true
-  }
-}
+import { RequiredStringValidator } from '@/application/validation'
 
 describe('RequiredStringValidator', () => {
   it('should return Error if value is Empty ', () => {

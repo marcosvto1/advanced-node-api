@@ -53,8 +53,6 @@ describe('PgUserAccountRepository', () => {
 
       const pgUser = await pgUserRepo.findOne({ email: 'any_email' })
 
-      console.log(pgUser)
-
       expect(pgUser?.id).toBe(1)
       expect(id).toBe('1')
     })

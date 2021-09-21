@@ -1,6 +1,6 @@
 import { FacebookLoginController } from '@/application/controllers'
 import { Http, HttpError } from '@/application/helpers'
-import { RequiredStringValidator, ValidationComposite } from '@/application/validation'
+import { ValidationComposite } from '@/application/validation'
 import { FacebookAuthenticationService } from '@/data/services'
 import { AuthenticationError } from '@/domain/errors'
 import { AccessToken } from '@/domain/models'
@@ -23,23 +23,17 @@ describe('FacebookLoginController', () => {
     sut = new FacebookLoginController(facebookAuthentication)
   })
 
-  it('should return 400 if validation is fails', async () => {
+  it('should build Validators correctly', async () => {
+    const validators = sut.buildValidators({ token })
     const error = new Error('validation_error')
     const RequestCompositeSpy = jest.fn().mockImplementationOnce(() => ({
       validate: jest.fn().mockReturnValueOnce(error)
     }))
     mocked(ValidationComposite).mockImplementationOnce(RequestCompositeSpy)
 
-    const httpResponse = await sut.handle({ token })
+    await sut.handle({ token })
 
-    expect(RequestCompositeSpy).toHaveBeenCalledWith([
-      new RequiredStringValidator('any_token', 'token')
-    ])
-
-    expect(httpResponse).toEqual({
-      statusCode: Http.Status.BAD_REQUEST,
-      data: error
-    })
+    expect(RequestCompositeSpy).toHaveBeenCalledWith(validators)
   })
 
   it('should return 401 if FacebookAuthService fails', async () => {
@@ -61,17 +55,6 @@ describe('FacebookLoginController', () => {
       data: {
         accessToken: 'any_value'
       }
-    })
-  })
-  it('should return 500 if FacebookAuthService throws', async () => {
-    const error = new Error('infra_error')
-    facebookAuthentication.perform.mockRejectedValueOnce(error)
-
-    const httpResponse = await sut.handle({ token })
-
-    expect(httpResponse).toEqual({
-      statusCode: Http.Status.SERVER_ERROR,
-      data: new HttpError.Server(error)
     })
   })
 

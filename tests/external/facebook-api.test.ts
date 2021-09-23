@@ -2,7 +2,7 @@ import { FacebookApi } from '@/infra/apis'
 import { AxiosHttpClient } from '@/infra/http'
 import { env } from '@/main/config/env'
 
-describe('', () => {
+describe('FacebookApiIntegrationTests', () => {
   it('Should return a Facebook if Token is Valid', async () => {
     const axiosClient = new AxiosHttpClient()
     const sut = new FacebookApi(

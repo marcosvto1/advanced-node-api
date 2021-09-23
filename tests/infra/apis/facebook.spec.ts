@@ -36,7 +36,7 @@ describe('FacebookApi', () => {
       params: {
         client_id: clientId,
         client_secret: clientSecret,
-        grant_type: 'client_crendentials'
+        grant_type: 'client_credentials'
       }
     })
   })
@@ -73,5 +73,13 @@ describe('FacebookApi', () => {
       name: 'any_fb_name',
       email: 'any_fb_email'
     })
+  })
+
+  it('should return undefinied if httpGetClient throwa', async () => {
+    httpClient.get.mockReset().mockRejectedValueOnce(new Error('http_error'))
+
+    const fbUser = await sut.loadUser({ token: 'any_client_token' })
+
+    expect(fbUser).toBeUndefined()
   })
 })

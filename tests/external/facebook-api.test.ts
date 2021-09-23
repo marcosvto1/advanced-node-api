@@ -19,4 +19,17 @@ describe('FacebookApiIntegrationTests', () => {
       name: 'Marcos Test'
     })
   })
+
+  it('Should return a undefinied User if Token is invalid', async () => {
+    const axiosClient = new AxiosHttpClient()
+    const sut = new FacebookApi(
+      axiosClient,
+      env.facebookApi.clientId,
+      env.facebookApi.clientSecret
+    )
+
+    const fbUser = await sut.loadUser({ token: 'token_invalid' })
+
+    expect(fbUser).toBeUndefined()
+  })
 })

@@ -5,5 +5,6 @@ export const env = {
   },
   app: {
     port: process.env.PORT ?? 8000
-  }
+  },
+  jwtSecret: process.env.JWT_SECRET ?? 'SADSADSA5546456'
 }

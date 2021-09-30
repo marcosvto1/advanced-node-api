@@ -1,14 +1,15 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { getMockReq, getMockRes } from '@jest-mock/express'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { Controller } from '@/application/controllers/controller'
-import { ExpressRouter } from '@/infra/http'
+import { adaptExpressRoute } from '@/infra/http/express-router'
 
 describe('ExpressRouter', () => {
   let req: Request
   let res: Response
+  let next: NextFunction
   let controller: MockProxy<Controller>
-  let sut: ExpressRouter
+  let sut: RequestHandler
 
   beforeEach(() => {
     req = getMockReq({
@@ -24,11 +25,11 @@ describe('ExpressRouter', () => {
         data: 'any_data'
       }
     })
-    sut = new ExpressRouter(controller)
+    sut = adaptExpressRoute(controller)
   })
 
   it('should call handle with correct request', async () => {
-    await sut.adapt(req, res)
+    await sut(req, res, next)
 
     expect(controller.handle).toHaveBeenCalledWith({
       any: 'any'
@@ -41,13 +42,13 @@ describe('ExpressRouter', () => {
       body: undefined
     })
 
-    await sut.adapt(req, res)
+    await sut(req, res, next)
 
     expect(controller.handle).toHaveBeenCalledWith({})
   })
 
   it('should respond with 200 and valid data', async () => {
-    await sut.adapt(req, res)
+    await sut(req, res, next)
 
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith({
@@ -61,7 +62,7 @@ describe('ExpressRouter', () => {
       data: new Error('any_error')
     })
 
-    await sut.adapt(req, res)
+    await sut(req, res, next)
 
     expect(res.status).toHaveBeenCalledWith(400)
     expect(res.json).toHaveBeenCalledWith({ error: 'any_error' })
@@ -73,7 +74,7 @@ describe('ExpressRouter', () => {
       data: new Error('any_error')
     })
 
-    await sut.adapt(req, res)
+    await sut(req, res, next)
 
     expect(res.status).toHaveBeenCalledWith(500)
     expect(res.json).toHaveBeenCalledWith({ error: 'any_error' })

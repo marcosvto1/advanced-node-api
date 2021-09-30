@@ -10,7 +10,7 @@ export abstract class Controller {
     return []
   }
 
-  async handle (request: Http.Request): Promise<Http.Response<Model>> {
+  async handle (request: Http.Request): Promise<Http.Response<any>> {
     const error = this.validate(request)
     if (error !== undefined) {
       return HttpStatus.badRequest(error)

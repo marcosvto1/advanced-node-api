@@ -36,7 +36,10 @@ export class FacebookApi implements LoadFacebookUserApi {
         name,
         email
       })
-    ).catch(() => undefined)
+    ).catch((err) => {
+      console.log(err.response.data)
+      return undefined
+    })
   }
 
   private async getAppToken (): Promise<AppToken> {

@@ -1,5 +1,16 @@
 import * as dotenv from 'dotenv'
+import { ConnectionOptions } from 'typeorm'
 dotenv.config()
+
+export const ormconfig: ConnectionOptions = {
+  type: 'postgres',
+  host: process.env.DB_HOST ?? 'localhost',
+  port: 5432,
+  username: process.env.DB_USERNAME ?? 'myuserdb',
+  database: process.env.DB_NAME ?? 'mzbjyekm',
+  password: process.env.DB_PASSWORD ?? 'myuserpassword',
+  entities: ['dist/infra/postgres/entities/index.js']
+}
 
 export const env = {
   facebookApi: {
@@ -10,11 +21,5 @@ export const env = {
     port: process.env.PORT ?? 8000
   },
   jwtSecret: process.env.JWT_SECRET ?? 'SADSADSA5546456',
-  postgres: {
-    host: process.env.DB_HOST ?? 'localhost',
-    port: process.env.DB_PORT ?? 5432,
-    username: process.env.DB_USERNAME ?? 'myuserdb',
-    database: process.env.DB_NAME ?? 'mzbjyekm',
-    password: process.env.DB_PASSWORD ?? 'myuserpassword'
-  }
+  ormconfig
 }

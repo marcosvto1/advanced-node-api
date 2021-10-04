@@ -1,7 +1,7 @@
 import { Controller } from '@/application/controllers/controller'
 import { Http, HttpStatus } from '@/application/helpers'
 import { ValidationBuilder as Builder, Validator } from '@/application/validation'
-import { FacebookAuthenticationService } from '@/data/services'
+import { FacebookAuthenticationService } from '@/domain/services'
 import { AccessToken } from '@/domain/models'
 
 export type Model = Error | {

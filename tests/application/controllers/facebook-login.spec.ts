@@ -1,7 +1,7 @@
 import { FacebookLoginController } from '@/application/controllers'
 import { Http, HttpError } from '@/application/helpers'
 import { ValidationComposite } from '@/application/validation'
-import { FacebookAuthenticationService } from '@/data/services'
+import { FacebookAuthenticationService } from '@/domain/services'
 import { AuthenticationError } from '@/domain/errors'
 import { AccessToken } from '@/domain/models'
 

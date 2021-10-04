@@ -1,4 +1,4 @@
-import { LoadUserAccountRepository, SaveFacebookAccountRepository } from '@/data/contracts/repo'
+import { LoadUserAccountRepository, SaveFacebookAccountRepository } from '@/domain/contracts/repo'
 import { PgUser } from '@/infra/postgres/entities'
 import { getRepository } from 'typeorm'
 

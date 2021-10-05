@@ -5,10 +5,4 @@ enum Time {
   MILLI=1000
 }
 
-export class AccessToken {
-  constructor (public readonly value: string) {}
-
-  static get expirationInMs (): number {
-    return Time.MIN * Time.SECOND * Time.MILLI
-  }
-}
+export const AccessToken = { expirationInMs: Time.MIN * Time.SECOND * Time.MILLI }

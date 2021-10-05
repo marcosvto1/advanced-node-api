@@ -1,9 +1,9 @@
 import { FacebookLoginController } from '@/application/controllers'
 import { Http, HttpError } from '@/application/helpers'
 import { ValidationComposite } from '@/application/validation'
-import { FacebookAuthenticationService } from '@/domain/services'
-import { AuthenticationError } from '@/domain/errors'
-import { AccessToken } from '@/domain/models'
+import { FacebookAuthenticationUseCase } from '@/domain/usecases'
+import { AuthenticationError } from '@/domain/entities/errors'
+import { AccessToken } from '@/domain/entities'
 
 import { mock, MockProxy } from 'jest-mock-extended'
 import { mocked } from 'ts-jest/utils'
@@ -11,7 +11,7 @@ import { mocked } from 'ts-jest/utils'
 jest.mock('@/application/validation/composite')
 
 describe('FacebookLoginController', () => {
-  let facebookAuthentication: MockProxy<FacebookAuthenticationService>
+  let facebookAuthentication: MockProxy<FacebookAuthenticationUseCase>
   let sut: FacebookLoginController
   let token: string
 
@@ -58,7 +58,7 @@ describe('FacebookLoginController', () => {
     })
   })
 
-  it('should calls FacebookAuthenticationService with correct params', async () => {
+  it('should calls FacebookAuthenticationUseCase with correct params', async () => {
     await sut.handle({ token: 'any_token' })
 
     expect(facebookAuthentication.perform).toHaveBeenCalledWith({ token })

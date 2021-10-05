@@ -1,12 +1,12 @@
 import { LoadFacebookUserApi } from '@/domain/contracts/apis/facebook'
-import { AuthenticationError } from '@/domain/errors'
+import { AuthenticationError } from '@/domain/entities/errors'
 import { FacebookAuthentication } from '@/domain/features'
 import { UserAccountRepository } from '@/domain/contracts/repo'
-import { FacebookAccount } from '@/domain/models/facebook-account'
+import { FacebookAccount } from '@/domain/entities/facebook-account'
 import { TokenGenerator } from '@/domain/contracts/crypto'
-import { AccessToken } from '@/domain/models'
+import { AccessToken } from '@/domain/entities'
 
-export class FacebookAuthenticationService implements FacebookAuthentication {
+export class FacebookAuthenticationUseCase implements FacebookAuthentication {
   constructor (
     private readonly facebookApi: LoadFacebookUserApi,
     private readonly userAccountRepo: UserAccountRepository,

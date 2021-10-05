@@ -1,15 +1,15 @@
 import { Controller } from '@/application/controllers/controller'
 import { Http, HttpStatus } from '@/application/helpers'
 import { ValidationBuilder as Builder, Validator } from '@/application/validation'
-import { FacebookAuthenticationService } from '@/domain/services'
-import { AccessToken } from '@/domain/models'
+import { FacebookAuthenticationUseCase } from '@/domain/usecases'
+import { AccessToken } from '@/domain/entities'
 
 export type Model = Error | {
   accessToken: string
 }
 export class FacebookLoginController extends Controller {
   constructor (
-    private readonly facebookAuthenticationService: FacebookAuthenticationService
+    private readonly facebookAuthenticationService: FacebookAuthenticationUseCase
   ) {
     super()
   }

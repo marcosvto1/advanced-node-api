@@ -11,8 +11,7 @@ class AuthenticationMiddleware {
   ) {}
 
   async handle ({ authorization }: HttpRequest): Promise<Http.Response<Model>> {
-    const error = new RequiredStringValidator(authorization, 'authorization').validate()
-    if (error !== undefined) {
+    if (!this.validate({ authorization })) {
       return HttpStatus.forbiddenError()
     }
     try {
@@ -23,6 +22,11 @@ class AuthenticationMiddleware {
     } catch (error) {
       return HttpStatus.forbiddenError()
     }
+  }
+
+  private validate ({ authorization }: HttpRequest): boolean {
+    const error = new RequiredStringValidator(authorization, 'authorization').validate()
+    return error === undefined
   }
 }
 

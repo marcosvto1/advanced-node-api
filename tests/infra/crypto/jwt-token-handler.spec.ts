@@ -37,6 +37,7 @@ describe('JwtTokenHandler', () => {
       })
 
       expect(fakeJwt.sign).toHaveBeenCalledWith({ key }, secret, { expiresIn: 1 })
+      expect(fakeJwt.sign).toHaveBeenCalledTimes(1)
     })
 
     it('should return data on success', async () => {
@@ -60,5 +61,18 @@ describe('JwtTokenHandler', () => {
     })
   })
 
-  describe('ValidateToken', () => {})
+  describe('ValidateToken', () => {
+    let token: string
+
+    beforeAll(() => {
+      token = 'any_token'
+    })
+
+    it('should call verify with correct params', async () => {
+      await sut.validateToken({ token })
+
+      expect(fakeJwt.verify).toHaveBeenCalledWith(token, secret)
+      expect(fakeJwt.verify).toHaveBeenCalledTimes(1)
+    })
+  })
 })

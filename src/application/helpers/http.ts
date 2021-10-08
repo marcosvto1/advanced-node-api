@@ -7,6 +7,7 @@ export namespace Http {
     BAD_REQUEST=400,
     SERVER_ERROR=500,
     UNAUTHORIZED=401,
+    FORBIDDEN=403,
     CREATED=201
   }
 }
@@ -33,6 +34,13 @@ export namespace HttpError {
       this.name = 'UnauthorizedError'
     }
   }
+
+  export class ForbiddenError extends Error {
+    constructor () {
+      super('Forbidden')
+      this.name = 'ForbiddenError'
+    }
+  }
 }
 
 export namespace HttpStatus {
@@ -54,5 +62,10 @@ export namespace HttpStatus {
   export const serverError = (): Http.Response<Error> => ({
     statusCode: Http.Status.SERVER_ERROR,
     data: new HttpError.Server()
+  })
+
+  export const forbiddenError = (): Http.Response<Error> => ({
+    statusCode: Http.Status.FORBIDDEN,
+    data: new HttpError.ForbiddenError()
   })
 }

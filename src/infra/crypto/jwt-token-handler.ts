@@ -4,7 +4,7 @@ import { sign } from 'jsonwebtoken'
 
 type Params = TokenGenerator.Params
 
-export class JwtTokenGenerator implements TokenGenerator {
+export class JwtTokenHandler implements TokenGenerator {
   constructor (
     private readonly secret: string
   ) {}

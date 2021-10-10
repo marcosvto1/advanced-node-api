@@ -1,10 +1,10 @@
 import { Http, HttpStatus } from '@/application/helpers'
 import { Middleware } from '@/application/middlewares'
 import { RequiredStringValidator } from '@/application/validation'
-import { Authorize } from '@/domain/usecases'
 
 type HttpRequest = { authorization: string }
 type Model = Error | { userId: string }
+export type Authorize = (params: { token: string }) => Promise<string>
 
 export class AuthenticationMiddleware implements Middleware {
   constructor (
@@ -21,6 +21,7 @@ export class AuthenticationMiddleware implements Middleware {
         userId
       })
     } catch (error) {
+      console.log(error)
       return HttpStatus.forbiddenError()
     }
   }

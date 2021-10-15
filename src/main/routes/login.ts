@@ -4,4 +4,8 @@ import { Router } from 'express'
 
 export default (router: Router): void => {
   router.post('/login/facebook', adapt(makeFacebookLoginController()))
+  router.get('/abc', (req, res) => {
+    const a = 'test3'
+    res.json({ a })
+  })
 }

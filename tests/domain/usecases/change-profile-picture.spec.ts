@@ -47,7 +47,8 @@ describe('ChangeProfilePicture', () => {
     await sut({ id: 'any_id', file })
 
     expect(userProfileRepo.savePicture).toHaveBeenLastCalledWith({
-      pictureUrl: 'any_url'
+      pictureUrl: 'any_url',
+      initials: undefined
     })
     expect(userProfileRepo.savePicture).toHaveBeenCalledTimes(1)
   })

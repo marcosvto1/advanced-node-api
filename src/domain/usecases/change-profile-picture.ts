@@ -12,11 +12,12 @@ export const setupChangeProfilePicture: Setup = (fileStorage, generatorUUID, use
       file,
       key: uuid
     })
+  } else {
+    await userProfileRepo.load({
+      id
+    })
   }
   await userProfileRepo.savePicture({
     pictureUrl
-  })
-  await userProfileRepo.load({
-    id
   })
 }

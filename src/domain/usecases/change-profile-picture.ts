@@ -16,9 +16,9 @@ export const setupChangeProfilePicture: Setup = (fileStorage, generatorUUID, use
   userProfile.setPicture(data)
   try {
     await userProfileRepo.savePicture(userProfile)
-  } catch {
+  } catch (error) {
     if (file !== undefined) await fileStorage.delete({ key: Keyuuid })
-    throw new Error()
+    throw error
   }
   return userProfile
 }

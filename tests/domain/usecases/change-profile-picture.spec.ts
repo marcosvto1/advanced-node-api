@@ -91,6 +91,8 @@ describe('ChangeProfilePicture', () => {
   it('should call deleteFile when file exists and SaveUserPicture throws', async () => {
     userProfileRepo.savePicture.mockRejectedValueOnce(new Error())
 
+    expect.assertions(2)
+
     mocked(UserProfile).mockImplementationOnce((id) => ({
       setPicture: jest.fn(),
       id: 'any_id',
@@ -98,11 +100,19 @@ describe('ChangeProfilePicture', () => {
       initials: 'any_initials'
     }))
 
-    const promise = sut({ id: 'any_id', file })
+    await sut({ id: 'any_id', file })
+    expect(fileStorage.delete).toHaveBeenCalledWith({ key: uuid })
+    expect(fileStorage.delete).toHaveBeenCalledTimes(1)
+    // promise.catch(() => {
+    //   expect(fileStorage.delete).toHaveBeenCalledWith({ key: uuid })
+    //   expect(fileStorage.delete).toHaveBeenCalledTimes(1)
+    // })
+  })
+  it('should not call deleteFile when file does not exists and SaveUserPicture throws', async () => {
+    userProfileRepo.savePicture.mockRejectedValueOnce(new Error())
 
-    promise.catch(() => {
-      expect(fileStorage.delete).toHaveBeenCalledWith({ key: uuid })
-      expect(fileStorage.delete).toHaveBeenCalledTimes(1)
-    })
+    await sut({ id: 'any_id', file: undefined })
+
+    expect(fileStorage.delete).not.toHaveBeenCalled()
   })
 })

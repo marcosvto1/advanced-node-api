@@ -11,18 +11,23 @@ class UUIDHandler implements UUIDGenrator {
 jest.mock('crypto')
 
 describe('UUIDHanlder', () => {
-  it('should call uuid', () => {
-    const sut = new UUIDHandler()
+  let sut: UUIDHandler
 
+  beforeEach(() => {
+    sut = new UUIDHandler()
+  })
+
+  beforeAll(() => {
+    mocked(randomUUID).mockReturnValue('any_uuid')
+  })
+
+  it('should call uuid', () => {
     sut.generate()
 
     expect(randomUUID).toHaveBeenCalledTimes(1)
   })
 
   it('should return correct uuid', () => {
-    mocked(randomUUID).mockReturnValueOnce('any_uuid')
-    const sut = new UUIDHandler()
-
     const uuid = sut.generate()
 
     expect(uuid).toBe('any_uuid')

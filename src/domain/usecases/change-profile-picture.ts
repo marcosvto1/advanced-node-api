@@ -10,7 +10,7 @@ export const setupChangeProfilePicture: Setup = (fileStorage, generatorUUID, use
   const Keyuuid = generatorUUID.generate()
   const data = {
     pictureUrl: file !== undefined ? await fileStorage.upload({ file, key: Keyuuid }) : undefined,
-    name: file === undefined ? (await userProfileRepo.load({ id })).name : undefined
+    name: file === undefined ? (await userProfileRepo.load({ id }))?.name : undefined
   }
   const userProfile = new UserProfile(id)
   userProfile.setPicture(data)

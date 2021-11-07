@@ -1,12 +1,6 @@
-import { UUIDGenrator } from '@/domain/contracts/gateways'
+import { UUIDHandler } from '@/infra/crypto'
 import { randomUUID } from 'crypto'
 import { mocked } from 'ts-jest/utils'
-
-class UUIDHandler implements UUIDGenrator {
-  generate (): UUIDGenrator.Output {
-    return randomUUID()
-  }
-}
 
 jest.mock('crypto')
 

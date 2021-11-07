@@ -21,7 +21,6 @@ export class AuthenticationMiddleware implements Middleware {
         userId
       })
     } catch (error) {
-      console.log(error)
       return HttpStatus.forbiddenError()
     }
   }

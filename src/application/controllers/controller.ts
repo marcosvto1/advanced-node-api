@@ -18,7 +18,6 @@ export abstract class Controller {
     try {
       return await this.perform(request)
     } catch (error) {
-      console.log(error)
       return HttpStatus.serverError()
     }
   }

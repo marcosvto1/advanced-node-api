@@ -1,5 +1,5 @@
 import { LoadUserAccount, SaveFacebookAccount } from '@/domain/contracts/repo'
-import { PgUser } from '@/infra/postgres/entities'
+import { PgUser } from '@/infra/repos/postgres/entities'
 import { getRepository } from 'typeorm'
 
 type LoadParams = LoadUserAccount.Params

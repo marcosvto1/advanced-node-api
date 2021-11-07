@@ -8,5 +8,4 @@ export namespace HttpGetClient {
     url: string
     params: any
   }
-
 }

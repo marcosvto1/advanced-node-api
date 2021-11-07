@@ -1,4 +1,4 @@
-import { UUIDHandler } from '@/infra/crypto'
+import { UUIDHandler } from '@/infra/gateways'
 import { randomUUID } from 'crypto'
 import { mocked } from 'ts-jest/utils'
 

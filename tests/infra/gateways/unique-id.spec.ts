@@ -1,4 +1,4 @@
-import { UniqueId } from '@/infra/crypto/unique-id'
+import { UniqueId } from '@/infra/gateways/unique-id'
 
 describe('UniqueId', () => {
   it('should return unique id correct value', () => {

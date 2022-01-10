@@ -1,4 +1,5 @@
 import { FacebookLoginController } from '@/application/controllers'
+import { Controller } from '@/application/controllers/controller'
 import { Http, HttpError } from '@/application/helpers'
 import { ValidationComposite } from '@/application/validation'
 import { AuthenticationError } from '@/domain/entities/errors'
@@ -19,6 +20,10 @@ describe('FacebookLoginController', () => {
     facebookAuthentication = jest.fn()
     facebookAuthentication.mockResolvedValue({ accessToken: 'any_value' })
     sut = new FacebookLoginController(facebookAuthentication)
+  })
+
+  it('should extends controller', () => {
+    expect(sut).toBeInstanceOf(Controller)
   })
 
   it('should build Validators correctly', async () => {

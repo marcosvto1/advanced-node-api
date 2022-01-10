@@ -1,6 +1,6 @@
 import { Http, HttpError, HttpStatus } from '@/application/helpers'
 
-type HttpRequest = { file: any}
+type HttpRequest = { file: { buffer: Buffer }}
 type Model = Error
 
 export class SavePictureController {
@@ -17,7 +17,7 @@ describe('SavePictureController', () => {
   })
 
   it('should returns 400 if file is not provided', async () => {
-    const httpResponse = await sut.perform({ file: undefined })
+    const httpResponse = await sut.perform({ file: undefined as any })
 
     expect(httpResponse).toEqual({
       statusCode: 400,
@@ -26,7 +26,16 @@ describe('SavePictureController', () => {
   })
 
   it('should returns 400 if file is not provided', async () => {
-    const httpResponse = await sut.perform({ file: null })
+    const httpResponse = await sut.perform({ file: null as any })
+
+    expect(httpResponse).toEqual({
+      statusCode: 400,
+      data: new HttpError.RequiredField('file')
+    })
+  })
+
+  it('should returns 400 if file is empty', async () => {
+    const httpResponse = await sut.perform({ file: { buffer: Buffer.from('') } })
 
     expect(httpResponse).toEqual({
       statusCode: 400,

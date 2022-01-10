@@ -1,11 +1,13 @@
+import { Http, HttpStatus } from '@/application/helpers'
 import { ChangeProfilePicture } from '@/domain/usecases'
 
 type HttpRequest = { userId: string }
 
 export class DeletePictureController {
   constructor (private readonly changeProfilePicture: ChangeProfilePicture) {}
-  async call (httpRequest: HttpRequest): Promise<void> {
+  async call (httpRequest: HttpRequest): Promise<Http.Response> {
     await this.changeProfilePicture({ id: httpRequest.userId })
+    return HttpStatus.notContent()
   }
 }
 
@@ -26,5 +28,14 @@ describe('DeletePictureController', () => {
 
     expect(changeProfilePicture).toHaveBeenCalledWith({ id: 'any_user_id' })
     expect(changeProfilePicture).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return 204', async () => {
+    const httpResponse = await sut.call({ userId: 'any_user_id' })
+
+    expect(httpResponse).toEqual({
+      statusCode: 204,
+      data: undefined
+    })
   })
 })

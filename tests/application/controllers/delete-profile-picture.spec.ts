@@ -1,11 +1,15 @@
+import { Controller } from '@/application/controllers/controller'
 import { Http, HttpStatus } from '@/application/helpers'
 import { ChangeProfilePicture } from '@/domain/usecases'
 
 type HttpRequest = { userId: string }
 
-export class DeletePictureController {
-  constructor (private readonly changeProfilePicture: ChangeProfilePicture) {}
-  async call (httpRequest: HttpRequest): Promise<Http.Response> {
+export class DeletePictureController extends Controller {
+  constructor (private readonly changeProfilePicture: ChangeProfilePicture) {
+    super()
+  }
+
+  async perform (httpRequest: HttpRequest): Promise<Http.Response> {
     await this.changeProfilePicture({ id: httpRequest.userId })
     return HttpStatus.notContent()
   }
@@ -23,19 +27,23 @@ describe('DeletePictureController', () => {
     sut = new DeletePictureController(changeProfilePicture)
   })
 
-  it('should call ChangeProfilePicture with correct input', async () => {
-    await sut.call({ userId: 'any_user_id' })
+  it('should calls ChangeProfilePicture with correct input', async () => {
+    await sut.perform({ userId: 'any_user_id' })
 
     expect(changeProfilePicture).toHaveBeenCalledWith({ id: 'any_user_id' })
     expect(changeProfilePicture).toHaveBeenCalledTimes(1)
   })
 
   it('should return 204', async () => {
-    const httpResponse = await sut.call({ userId: 'any_user_id' })
+    const httpResponse = await sut.perform({ userId: 'any_user_id' })
 
     expect(httpResponse).toEqual({
       statusCode: 204,
       data: undefined
     })
+  })
+
+  it('should extends controller', () => {
+    expect(sut).toBeInstanceOf(Controller)
   })
 })

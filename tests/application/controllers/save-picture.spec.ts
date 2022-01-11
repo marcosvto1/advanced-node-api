@@ -1,16 +1,20 @@
 import { Http, HttpError, HttpStatus } from '@/application/helpers'
 
-type HttpRequest = { file: { buffer: Buffer, mimeType: string }}
-type Model = Error
+type FileType = { buffer: Buffer, mimeType: string }
+type HttpRequest = { file: FileType}
+type Model = Error | any
 
 export class SavePictureController {
   async perform ({ file }: HttpRequest): Promise<Http.Response<Model>> {
     if (file === undefined || file === null) return HttpStatus.badRequest(new HttpError.RequiredField('file'))
     if (file.buffer.length === 0) return HttpStatus.badRequest(new HttpError.RequiredField('file'))
-    return HttpStatus.badRequest(new InvalidMymeTypeError(['png', 'jpeg']))
+    if (file.mimeType === undefined) return HttpStatus.badRequest(new InvalidMymeTypeError(['png', 'jpeg']))
+    if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.mimeType)) {
+      return HttpStatus.badRequest(new InvalidMymeTypeError(['png', 'jpeg']))
+    }
+    return HttpStatus.ok({})
   }
 }
-
 class InvalidMymeTypeError extends Error {
   constructor (allowed: string[]) {
     super(`Unsupoported type. Allowed types: ${allowed.join(',')}`)
@@ -60,12 +64,32 @@ describe('SavePictureController', () => {
     })
   })
 
-  it('should returns 400 if file type is invalid', async () => {
-    const httpResponse = await sut.perform({ file: { buffer, mimeType: 'invalid_type' } })
+  describe('Valid Mimetypes', () => {
+    it('should returns 400 if file type is invalid', async () => {
+      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'invalid_type' } })
 
-    expect(httpResponse).toEqual({
-      statusCode: 400,
-      data: new InvalidMymeTypeError(['png', 'jpeg'])
+      expect(httpResponse).toEqual({
+        statusCode: 400,
+        data: new InvalidMymeTypeError(['png', 'jpeg'])
+      })
+    })
+
+    it('should not returns 400 if file type is valid', async () => {
+      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'image/png' } })
+
+      expect(httpResponse).not.toEqual({
+        statusCode: 400,
+        data: new InvalidMymeTypeError(['png', 'jpeg'])
+      })
+    })
+
+    it('should not returns 400 if file type is valid', async () => {
+      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'image/jpeg' } })
+
+      expect(httpResponse).not.toEqual({
+        statusCode: 400,
+        data: new InvalidMymeTypeError(['png', 'jpeg'])
+      })
     })
   })
 })

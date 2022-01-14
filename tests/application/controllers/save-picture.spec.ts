@@ -3,7 +3,7 @@ import { ChangeProfilePicture } from '@/domain/usecases'
 
 type FileType = { buffer: Buffer, mimeType: string }
 type HttpRequest = { file: FileType, userId: string}
-type Model = Error | any
+type Model = Error | { initials?: string, pictureUrl?: string}
 
 export class SavePictureController {
   constructor (
@@ -19,8 +19,8 @@ export class SavePictureController {
     }
     if (file.buffer.length > 5 * 1024 * 1024) return HttpStatus.badRequest(new MaxFileSizeError(5))
 
-    await this.changeProfilePicture({ id: userId, file: file.buffer })
-    return HttpStatus.ok({})
+    const data = await this.changeProfilePicture({ id: userId, file: file.buffer })
+    return HttpStatus.ok(data)
   }
 }
 class InvalidMymeTypeError extends Error {
@@ -38,7 +38,6 @@ class MaxFileSizeError extends Error {
 
 describe('SavePictureController', () => {
   let sut: SavePictureController
-  // let file: { buffer: Buffer }
   let buffer: Buffer
   let mimeType: string
   let file: { buffer: Buffer, mimeType: string}
@@ -49,7 +48,10 @@ describe('SavePictureController', () => {
     buffer = Buffer.from('any_buffer')
     mimeType = 'image/png'
     file = { buffer, mimeType }
-    changeProfilePicture = jest.fn()
+    changeProfilePicture = jest.fn().mockResolvedValue({
+      initials: 'any_initials',
+      pictureUrl: 'any_url'
+    })
     userId = 'any_user_id'
   })
 
@@ -127,6 +129,15 @@ describe('SavePictureController', () => {
 
       expect(changeProfilePicture).toHaveBeenCalledWith({ id: userId, file: buffer })
       expect(changeProfilePicture).toHaveBeenCalledTimes(1)
+    })
+
+    it('should return 200 with valida data', async () => {
+      const httpResponse = await sut.perform({ file, userId })
+
+      expect(httpResponse).toEqual({
+        statusCode: 200,
+        data: { initials: 'any_initials', pictureUrl: 'any_url' }
+      })
     })
   })
 })

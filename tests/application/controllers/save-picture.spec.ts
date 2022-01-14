@@ -1,11 +1,16 @@
 import { Http, HttpError, HttpStatus } from '@/application/helpers'
+import { ChangeProfilePicture } from '@/domain/usecases'
 
 type FileType = { buffer: Buffer, mimeType: string }
-type HttpRequest = { file: FileType}
+type HttpRequest = { file: FileType, userId: string}
 type Model = Error | any
 
 export class SavePictureController {
-  async perform ({ file }: HttpRequest): Promise<Http.Response<Model>> {
+  constructor (
+    private readonly changeProfilePicture: ChangeProfilePicture
+  ) {}
+
+  async perform ({ file, userId }: HttpRequest): Promise<Http.Response<Model>> {
     if (file === undefined || file === null) return HttpStatus.badRequest(new HttpError.RequiredField('file'))
     if (file.buffer.length === 0) return HttpStatus.badRequest(new HttpError.RequiredField('file'))
     if (file.mimeType === undefined) return HttpStatus.badRequest(new InvalidMymeTypeError(['png', 'jpeg']))
@@ -14,6 +19,7 @@ export class SavePictureController {
     }
     if (file.buffer.length > 5 * 1024 * 1024) return HttpStatus.badRequest(new MaxFileSizeError(5))
 
+    await this.changeProfilePicture({ id: userId, file: file.buffer })
     return HttpStatus.ok({})
   }
 }
@@ -35,18 +41,24 @@ describe('SavePictureController', () => {
   // let file: { buffer: Buffer }
   let buffer: Buffer
   let mimeType: string
+  let file: { buffer: Buffer, mimeType: string}
+  let changeProfilePicture: jest.Mock
+  let userId: string
 
   beforeAll(() => {
     buffer = Buffer.from('any_buffer')
     mimeType = 'image/png'
+    file = { buffer, mimeType }
+    changeProfilePicture = jest.fn()
+    userId = 'any_user_id'
   })
 
   beforeEach(() => {
-    sut = new SavePictureController()
+    sut = new SavePictureController(changeProfilePicture)
   })
 
   it('should returns 400 if file is not provided', async () => {
-    const httpResponse = await sut.perform({ file: undefined as any })
+    const httpResponse = await sut.perform({ file: undefined as any, userId })
 
     expect(httpResponse).toEqual({
       statusCode: 400,
@@ -55,7 +67,7 @@ describe('SavePictureController', () => {
   })
 
   it('should returns 400 if file is not provided', async () => {
-    const httpResponse = await sut.perform({ file: null as any })
+    const httpResponse = await sut.perform({ file: null as any, userId })
 
     expect(httpResponse).toEqual({
       statusCode: 400,
@@ -64,7 +76,7 @@ describe('SavePictureController', () => {
   })
 
   it('should returns 400 if file is empty', async () => {
-    const httpResponse = await sut.perform({ file: { buffer: Buffer.from(''), mimeType } })
+    const httpResponse = await sut.perform({ file: { buffer: Buffer.from(''), mimeType }, userId })
 
     expect(httpResponse).toEqual({
       statusCode: 400,
@@ -74,7 +86,7 @@ describe('SavePictureController', () => {
 
   describe('Valid Mimetypes', () => {
     it('should returns 400 if file type is invalid', async () => {
-      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'invalid_type' } })
+      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'invalid_type' }, userId })
 
       expect(httpResponse).toEqual({
         statusCode: 400,
@@ -83,7 +95,7 @@ describe('SavePictureController', () => {
     })
 
     it('should not returns 400 if file type is valid', async () => {
-      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'image/png' } })
+      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'image/png' }, userId })
 
       expect(httpResponse).not.toEqual({
         statusCode: 400,
@@ -92,7 +104,7 @@ describe('SavePictureController', () => {
     })
 
     it('should not returns 400 if file type is valid', async () => {
-      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'image/jpeg' } })
+      const httpResponse = await sut.perform({ file: { buffer, mimeType: 'image/jpeg' }, userId })
 
       expect(httpResponse).not.toEqual({
         statusCode: 400,
@@ -102,12 +114,19 @@ describe('SavePictureController', () => {
 
     it('should  returns 400 if file size is bigger than 5mb', async () => {
       const invalidBuffer = Buffer.from(new ArrayBuffer(6 * 1024 * 1024))
-      const httpResponse = await sut.perform({ file: { buffer: invalidBuffer, mimeType } })
+      const httpResponse = await sut.perform({ file: { buffer: invalidBuffer, mimeType }, userId })
 
       expect(httpResponse).toEqual({
         statusCode: 400,
         data: new MaxFileSizeError(5)
       })
+    })
+
+    it('should call ChangeProfilePicture with correct input', async () => {
+      await sut.perform({ file, userId })
+
+      expect(changeProfilePicture).toHaveBeenCalledWith({ id: userId, file: buffer })
+      expect(changeProfilePicture).toHaveBeenCalledTimes(1)
     })
   })
 })

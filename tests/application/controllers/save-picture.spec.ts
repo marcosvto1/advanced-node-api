@@ -1,4 +1,5 @@
 import { SavePictureController } from '@/application/controllers'
+import { Controller } from '@/application/controllers/controller'
 import { ErrorContext } from '@/application/errors/validation'
 
 describe('SavePictureController', () => {
@@ -78,32 +79,36 @@ describe('SavePictureController', () => {
         data: new ErrorContext.InvalidMymeTypeError(['png', 'jpeg'])
       })
     })
+  })
 
-    it('should  returns 400 if file size is bigger than 5mb', async () => {
-      const invalidBuffer = Buffer.from(new ArrayBuffer(6 * 1024 * 1024))
-      const httpResponse = await sut.perform({ file: { buffer: invalidBuffer, mimeType }, userId })
+  it('should  returns 400 if file size is bigger than 5mb', async () => {
+    const invalidBuffer = Buffer.from(new ArrayBuffer(6 * 1024 * 1024))
+    const httpResponse = await sut.perform({ file: { buffer: invalidBuffer, mimeType }, userId })
 
-      expect(httpResponse).toEqual({
-        statusCode: 400,
-        data: new ErrorContext.MaxFileSizeError(5)
-      })
+    expect(httpResponse).toEqual({
+      statusCode: 400,
+      data: new ErrorContext.MaxFileSizeError(5)
     })
+  })
 
-    it('should call ChangeProfilePicture with correct input', async () => {
-      await sut.perform({ file, userId })
+  it('should call ChangeProfilePicture with correct input', async () => {
+    await sut.perform({ file, userId })
 
-      expect(changeProfilePicture).toHaveBeenCalledWith({ id: userId, file: buffer })
-      expect(changeProfilePicture).toHaveBeenCalledTimes(1)
+    expect(changeProfilePicture).toHaveBeenCalledWith({ id: userId, file: buffer })
+    expect(changeProfilePicture).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return 200 with valida data', async () => {
+    const httpResponse = await sut.perform({ file, userId })
+
+    expect(httpResponse).toEqual({
+      statusCode: 200,
+      data: { initials: 'any_initials', pictureUrl: 'any_url' }
     })
+  })
 
-    it('should return 200 with valida data', async () => {
-      const httpResponse = await sut.perform({ file, userId })
-
-      expect(httpResponse).toEqual({
-        statusCode: 200,
-        data: { initials: 'any_initials', pictureUrl: 'any_url' }
-      })
-    })
+  it('should extends controller', () => {
+    expect(sut).toBeInstanceOf(Controller)
   })
 })
 

@@ -1,11 +1,10 @@
 import { Http, HttpStatus } from '@/application/helpers'
 import { ValidationComposite, Validator } from '@/application/validation'
 
-export type Model = Error | {
-  accessToken: string
-}
+export type Model<T = any> = Error | T
 export abstract class Controller {
   abstract perform (request: Http.Request): Promise<Http.Response<Model>>
+
   buildValidators (request: Http.Request): Validator[] {
     return []
   }

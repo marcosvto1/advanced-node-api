@@ -1,10 +1,15 @@
 import { ErrorContext } from '@/application/errors/validation'
+import { Required } from '@/application/validation'
 
-export class RequiredStringValidator {
-  constructor (private readonly value: any, private readonly field: string) {}
+export class RequiredString extends Required {
+  constructor (
+    override readonly value: any,
+    override readonly field?: string) {
+    super(value, field)
+  }
 
-  validate (): Error | undefined {
-    if (this.value === '' || this.value === null || this.value === undefined) {
+  override validate (): Error | undefined {
+    if (super.validate() !== undefined || this.value === '') {
       return new ErrorContext.RequiredField(this.field)
     }
   }

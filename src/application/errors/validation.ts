@@ -1,7 +1,8 @@
 export namespace ErrorContext {
   export class RequiredField extends Error {
-    constructor (fieldName: string) {
-      super(`The field ${fieldName} token is required`)
+    constructor (fieldName?: string) {
+      const message = fieldName === undefined ? 'Field required' : `The field ${fieldName} token is required`
+      super(message)
       this.name = 'RequiredFieldError'
     }
   }

@@ -1,4 +1,4 @@
-import { HttpError } from '@/application/helpers'
+import { ErrorContext } from '@/application/errors/validation'
 import { RequiredStringValidator } from '@/application/validation'
 
 describe('RequiredStringValidator', () => {
@@ -7,7 +7,7 @@ describe('RequiredStringValidator', () => {
 
     const validate = sut.validate()
 
-    expect(validate).toEqual(new HttpError.RequiredField('any_field'))
+    expect(validate).toEqual(new ErrorContext.RequiredField('any_field'))
   })
 
   it('should return Error if value is null ', () => {
@@ -15,7 +15,7 @@ describe('RequiredStringValidator', () => {
 
     const validate = sut.validate()
 
-    expect(validate).toEqual(new HttpError.RequiredField('any_field'))
+    expect(validate).toEqual(new ErrorContext.RequiredField('any_field'))
   })
 
   it('should return Error if value is undefined ', () => {
@@ -23,7 +23,7 @@ describe('RequiredStringValidator', () => {
 
     const validate = sut.validate()
 
-    expect(validate).toEqual(new HttpError.RequiredField('any_field'))
+    expect(validate).toEqual(new ErrorContext.RequiredField('any_field'))
   })
 
   it('should reutrn true if value is not Empty ', () => {

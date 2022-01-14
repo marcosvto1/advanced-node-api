@@ -1,40 +1,5 @@
-import { Http, HttpError, HttpStatus } from '@/application/helpers'
-import { ChangeProfilePicture } from '@/domain/usecases'
-
-type FileType = { buffer: Buffer, mimeType: string }
-type HttpRequest = { file: FileType, userId: string}
-type Model = Error | { initials?: string, pictureUrl?: string}
-
-export class SavePictureController {
-  constructor (
-    private readonly changeProfilePicture: ChangeProfilePicture
-  ) {}
-
-  async perform ({ file, userId }: HttpRequest): Promise<Http.Response<Model>> {
-    if (file === undefined || file === null) return HttpStatus.badRequest(new HttpError.RequiredField('file'))
-    if (file.buffer.length === 0) return HttpStatus.badRequest(new HttpError.RequiredField('file'))
-    if (file.mimeType === undefined) return HttpStatus.badRequest(new InvalidMymeTypeError(['png', 'jpeg']))
-    if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.mimeType)) {
-      return HttpStatus.badRequest(new InvalidMymeTypeError(['png', 'jpeg']))
-    }
-    if (file.buffer.length > 5 * 1024 * 1024) return HttpStatus.badRequest(new MaxFileSizeError(5))
-
-    const data = await this.changeProfilePicture({ id: userId, file: file.buffer })
-    return HttpStatus.ok(data)
-  }
-}
-class InvalidMymeTypeError extends Error {
-  constructor (allowed: string[]) {
-    super(`Unsupoported type. Allowed types: ${allowed.join(',')}`)
-    this.name = 'InvalidMymeTypeError'
-  }
-}
-class MaxFileSizeError extends Error {
-  constructor (maxSizeInMb: number) {
-    super(`File upload limit ${maxSizeInMb}MB`)
-    this.name = 'MaxFileSizeError'
-  }
-}
+import { SavePictureController } from '@/application/controllers'
+import { ErrorContext } from '@/application/errors/validation'
 
 describe('SavePictureController', () => {
   let sut: SavePictureController
@@ -64,7 +29,7 @@ describe('SavePictureController', () => {
 
     expect(httpResponse).toEqual({
       statusCode: 400,
-      data: new HttpError.RequiredField('file')
+      data: new ErrorContext.RequiredField('file')
     })
   })
 
@@ -73,7 +38,7 @@ describe('SavePictureController', () => {
 
     expect(httpResponse).toEqual({
       statusCode: 400,
-      data: new HttpError.RequiredField('file')
+      data: new ErrorContext.RequiredField('file')
     })
   })
 
@@ -82,7 +47,7 @@ describe('SavePictureController', () => {
 
     expect(httpResponse).toEqual({
       statusCode: 400,
-      data: new HttpError.RequiredField('file')
+      data: new ErrorContext.RequiredField('file')
     })
   })
 
@@ -92,7 +57,7 @@ describe('SavePictureController', () => {
 
       expect(httpResponse).toEqual({
         statusCode: 400,
-        data: new InvalidMymeTypeError(['png', 'jpeg'])
+        data: new ErrorContext.InvalidMymeTypeError(['png', 'jpeg'])
       })
     })
 
@@ -101,7 +66,7 @@ describe('SavePictureController', () => {
 
       expect(httpResponse).not.toEqual({
         statusCode: 400,
-        data: new InvalidMymeTypeError(['png', 'jpeg'])
+        data: new ErrorContext.InvalidMymeTypeError(['png', 'jpeg'])
       })
     })
 
@@ -110,7 +75,7 @@ describe('SavePictureController', () => {
 
       expect(httpResponse).not.toEqual({
         statusCode: 400,
-        data: new InvalidMymeTypeError(['png', 'jpeg'])
+        data: new ErrorContext.InvalidMymeTypeError(['png', 'jpeg'])
       })
     })
 
@@ -120,7 +85,7 @@ describe('SavePictureController', () => {
 
       expect(httpResponse).toEqual({
         statusCode: 400,
-        data: new MaxFileSizeError(5)
+        data: new ErrorContext.MaxFileSizeError(5)
       })
     })
 

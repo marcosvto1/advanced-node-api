@@ -22,13 +22,6 @@ export namespace HttpError {
     }
   }
 
-  export class RequiredField extends Error {
-    constructor (fieldName: string) {
-      super(`The field ${fieldName} token is required`)
-      this.name = 'RequiredFieldError'
-    }
-  }
-
   export class Unauthorized extends Error {
     constructor () {
       super('Unauthorized')
